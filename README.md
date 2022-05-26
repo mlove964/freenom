@@ -26,15 +26,15 @@ Documentation: [English version](https://github.com/luolongfei/freenom/blob/main
 
 [🐳 通过 Docker 方式部署](#-方式一通过-docker-部署推荐最简单的部署方式)（推荐，最简单的部署方式）
 
-[🕹 通过腾讯云函数部署](#-方式二通过腾讯云函数部署)（供无服务器的用户使用）
+[🚈 通过 Railway 部署](#-方式二通过-Railway-部署)（推荐没有自己服务器的用户使用此方案）
 
-[🧊 通过阿里云函数部署](#-方式三通过阿里云函数部署)（同上，供无服务器的用户使用）
+[☁ 通过 各种云函数 部署](#-方式三通过各种云函数部署)（同上）
 
 [🚧 直接拉取源码部署](#-方式四直接拉取源码部署)
 
-[📋 捐赠名单 Donation List](#-捐赠名单-donation-list)
+[📋 赞助名单 Donation List](#-赞助名单-donation-list)
 
-[❤ 捐赠 Donation](#-捐赠-donation)
+[❤ 赞助 Donation](#-赞助-donation)
 
 [🪓 信仰](#-信仰)
 
@@ -56,9 +56,9 @@ Documentation: [English version](https://github.com/luolongfei/freenom/blob/main
   仓库，然后在 [@Mattraks](https://github.com/Mattraks) 的提醒下，通过特别的方式恢复了本仓库。
 - 本次封禁导致的直接后果是以前的`issues`全部丢失，以及近`1.8k`的`star`数重新归零，在动力上面确实有受到影响，不过也不会有太大影响，本项目依然长期维护，如果项目有帮到你，欢迎 star。
 - 狡兔三窟，临时仓库 https://github.com/luolongfei/next-freenom 也是备用仓库，如若本仓库再次失联，可以移步到备用仓库获取最新消息，正常情况下以后的开发维护依然在本仓库进行。
-- 推荐 [🐳 通过 Docker 方式部署](#-方式一通过-docker-部署推荐最简单的部署方式)，也可以参考下方文档 [🕹 通过腾讯云函数部署](#-方式二通过腾讯云函数部署)
-  或者 [🧊 通过阿里云函数部署](#-方式三通过阿里云函数部署)，腾讯云函数和阿里云函数不需要你有自己的服务器。
-  
+- 推荐 [🐳 通过 Docker 方式部署](#-方式一通过-docker-部署推荐最简单的部署方式)，也可以参考下方文档 [🚈 通过 Railway 部署](#-方式二通过-Railway-部署)
+  或者 [☁ 通过 各种云函数 部署](#-方式三通过各种云函数部署)，各种`云函数`不需要你有自己的服务器，不过由于`云函数`政策经常变化，也许 [Railway](https://railway.app/) 是更好的选择。
+
 ### 🌿 特别感谢 Special Thanks
 
 感谢 JetBrains 提供的非商业开源软件开发授权。
@@ -82,7 +82,7 @@ Thanks for non-commercial open source development authorization by JetBrains.
 ### 🎁 事前准备
 
 - VPS：随便一台服务器都行，系统推荐`Debian`或者`Centos7`，另外 PHP 版本需在`php7.3`及以上。如果你没有服务器，推荐参考下方文档
-  [🕹 通过腾讯云函数部署](#-方式二通过腾讯云函数部署) 或者 [🧊 通过阿里云函数部署](#-方式三通过阿里云函数部署) 。
+  [🚈 通过 Railway 部署](#-方式二通过-Railway-部署) 或者 [☁ 通过 各种云函数 部署](#-方式三通过各种云函数部署) 。
 - 送信邮箱（可选）：为了方便理解又称机器人邮箱，用于发送通知邮件。目前针对`Gmail`、`QQ邮箱`、`163邮箱`以及`Outlook邮箱`，程序会自动判断送信邮箱类型并使用合适的配置。
   如果你使用的是其它第三方邮箱或者自建邮件服务，那么请参考 [.env.example](https://github.com/luolongfei/freenom/blob/main/.env.example)
   文件中与邮件配置相关的注释进行配置。
@@ -350,6 +350,12 @@ docker run -d --name freenom --restart always -v $(pwd):/conf -v $(pwd)/logs:/ap
 删除旧的镜像，然后再执行上面的 `docker run -d --name freenom --restart always -v $(pwd):/conf -v $(pwd)/logs:/app/logs luolongfei/freenom`
 重新部署即可，这样部署后就是最新的代码了。当然，新版对应的`.env`文件可能有变动，不必担心，程序会自动更新`.env`文件内容，并将已有的配置迁移过去。
 
+一句话操作，即在`.env`文件所在目录下执行以下命令，即可完成更新升级：
+
+```shell
+docker rm -f freenom && docker rmi -f luolongfei/freenom && docker run -d --name freenom --restart always -v $(pwd):/conf -v $(pwd)/logs:/app/logs luolongfei/freenom
+```
+
 ##### 2.2 后期容器管理以及 Docker 常用命令
 
 查看容器在线状态及大小
@@ -404,43 +410,56 @@ systemctl restart docker
 
 ***
 
-### 🕹 方式二：通过腾讯云函数部署
+### 🚈 方式二：通过 Railway 部署
 
-*推荐没有自己服务器的用户使用。*
+*推荐没有自己服务器的用户使用此方案。*
 
-有关 【通过腾讯云函数部署】
-的具体操作步骤请参考 [此处](https://github.com/luolongfei/freenom/wiki/%F0%9F%95%B9-%E6%96%B9%E5%BC%8F%E4%BA%8C%EF%BC%9A%E9%80%9A%E8%BF%87%E8%85%BE%E8%AE%AF%E4%BA%91%E5%87%BD%E6%95%B0%E9%83%A8%E7%BD%B2)
+有关 【通过 Railway 部署】
+的具体操作步骤请参考 [此处](https://github.com/luolongfei/freenom/wiki/%E9%80%9A%E8%BF%87-Railway-%E9%83%A8%E7%BD%B2)
 
 ***
 
-### 🧊 方式三：通过阿里云函数部署
+### ☁ 方式三：通过各种云函数部署
 
-*推荐没有自己服务器的用户使用。*
+所有云函数使用的是同一个压缩包，已做兼容处理，下载地址：
+[https://github.com/luolongfei/freenom/releases/download/v0.5/freenom_scf.zip](https://github.com/luolongfei/freenom/releases/download/v0.5/freenom_scf.zip)
+。本文档会在发布新版的时候同步更新此处的压缩包下载地址，所以不必担心，你看到的下载地址指向的包一定是最新版本。
+
+下载后你将得到一个 zip 文件，将 zip 文件放到你能找到的任意目录，后面我们将以 zip 文件的形式上传到各种云函数。
+
+有关 【通过腾讯云函数部署】
+的具体操作步骤请参考 [此处](https://github.com/luolongfei/freenom/wiki/%E9%80%9A%E8%BF%87%E8%85%BE%E8%AE%AF%E4%BA%91%E5%87%BD%E6%95%B0%E9%83%A8%E7%BD%B2)
 
 有关 【通过阿里云函数部署】
-的具体操作步骤请参考 [此处](https://github.com/luolongfei/freenom/wiki/%F0%9F%A7%8A-%E6%96%B9%E5%BC%8F%E4%B8%89%EF%BC%9A%E9%80%9A%E8%BF%87%E9%98%BF%E9%87%8C%E4%BA%91%E5%87%BD%E6%95%B0%E9%83%A8%E7%BD%B2)
+的具体操作步骤请参考 [此处](https://github.com/luolongfei/freenom/wiki/%E9%80%9A%E8%BF%87%E9%98%BF%E9%87%8C%E4%BA%91%E5%87%BD%E6%95%B0%E9%83%A8%E7%BD%B2)
+
+有关 【通过华为云函数部署】
+的具体操作步骤请参考 [此处](https://github.com/luolongfei/freenom/wiki/%E9%80%9A%E8%BF%87%E5%8D%8E%E4%B8%BA%E4%BA%91%E5%87%BD%E6%95%B0%E9%83%A8%E7%BD%B2)
 
 ***
 
 ### 🚧 方式四：直接拉取源码部署
 
 有关 【直接拉取源码部署】
-的具体操作步骤请参考 [此处](https://github.com/luolongfei/freenom/wiki/%F0%9F%9A%A7-%E6%96%B9%E5%BC%8F%E5%9B%9B%EF%BC%9A%E7%9B%B4%E6%8E%A5%E6%8B%89%E5%8F%96%E6%BA%90%E7%A0%81%E9%83%A8%E7%BD%B2)
+的具体操作步骤请参考 [此处](https://github.com/luolongfei/freenom/wiki/%E7%9B%B4%E6%8E%A5%E6%8B%89%E5%8F%96%E6%BA%90%E7%A0%81%E9%83%A8%E7%BD%B2)
 
 ***
 
 遇到任何问题或 Bug 欢迎提 [issue](https://github.com/luolongfei/freenom/issues) （请按模板格式提`issue`，以便我快速复现你的问题，否则问题会被忽略）， 如果`Freenom`
 改变算法导致此项目失效，请提 [issue](https://github.com/luolongfei/freenom/issues) 告知，我会及时修复，本项目长期维护。 欢迎`star`~
 
-### 📋 捐赠名单 Donation List
+### 📋 赞助名单 Donation List
 
-非常感谢「 [这些用户](https://github.com/luolongfei/freenom/wiki/Donation-List) 」对本项目的捐赠支持！
+非常感谢「 [这些用户](https://github.com/luolongfei/freenom/wiki/Donation-List) 」对本项目的赞助支持！
 
-### ❤ 捐赠 Donation
+### ❤ 赞助 Donation
 
-如果你觉得本项目真的有帮助到你并且想回馈作者，感谢你的捐赠。
+如果你觉得本项目真的有帮助到你并且想回馈作者，感谢你的赞助。
+if you like my script, please consider supporting the project going forward. Your support is greatly appreciated 😃
 
-#### PayPal: [https://www.paypal.me/mybsdc](https://www.paypal.me/mybsdc)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/X7X8CA7S1)
+
+PayPal: [https://www.paypal.me/mybsdc](https://www.paypal.me/mybsdc)
 
 > Every time you spend money, you're casting a vote for the kind of world you want. -- Anna Lappe
 
@@ -448,7 +467,7 @@ systemctl restart docker
 
 ![每一次你花的钱都是在为你想要的世界投票。](https://s2.ax1x.com/2020/01/31/13P8cF.jpg)
 
-**你的 star 或者`小额打赏`是我长期维护此项目的动力所在，由衷感谢每一位支持者，“每一次你花的钱都是在为你想要的世界投票”。 另外，将本项目推荐给更多的人，也是一种支持的方式，用的人越多更新的动力越足。**
+**你的`star`或者`赞助`是我长期维护此项目的动力所在，由衷感谢每一位支持者，“每一次你花的钱都是在为你想要的世界投票”。 另外，将本项目推荐给更多的人，也是一种支持的方式，用的人越多更新的动力越足。**
 
 ### 🪓 信仰
 
@@ -485,11 +504,11 @@ systemctl restart docker
 
 - 解决 企业微信 因送信内容过长被截断问题
 
-#### [v0.4.5](https://github.com/luolongfei/freenom/releases/tag/v0.4.5) - 2022-02-26
+#### [v0.5](https://github.com/luolongfei/freenom/releases/tag/v0.5) - 2022-05-15
 
-- 支持多语言，中英文切换
-- 支持自建 Telegram 反代地址 [@Mattraks](https://github.com/Mattraks)
-- 更新各种依赖库，PHP 版本最低要求不低于 7.3
+- 增加支持 华为云函数、Railway 等部署方式
+- 支持在消息中显示服务器信息，该功能默认关闭
+- 优化部分代码逻辑
 
 ### 🎉 鸣谢
 
